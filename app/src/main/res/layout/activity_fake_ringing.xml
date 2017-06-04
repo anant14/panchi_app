@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.halfdotfull.panchi_app.Activities.FakeRinging">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="2"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#6EBD52">
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mom"
+                        android:layout_gravity="center"
+                        android:textSize="30dp"
+                        android:id="@+id/chosenfakename"
+                        android:textColor="@android:color/white"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+91 9811064998"
+                        android:id="@+id/chosenfakenumber"
+                        android:textColor="@android:color/white"/>
+                </LinearLayout>
+
+            </FrameLayout>
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"></RelativeLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/answercall"
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:layout_marginBottom="87sp"
+        android:layout_marginLeft="37sp"
+        android:layout_marginStart="37sp"
+        app:srcCompat="@drawable/s6_call_circle_receive_01"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+
+    <ImageView
+        android:id="@+id/rejectcall"
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:layout_marginEnd="33dp"
+        android:layout_marginRight="33dp"
+        app:srcCompat="@drawable/s6_call_circle_endcall_01"
+        android:layout_alignTop="@+id/answercall"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
+
+</RelativeLayout>
