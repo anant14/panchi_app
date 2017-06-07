@@ -51,7 +51,6 @@ public class MessageService extends Service implements SensorEventListener {
     String add, cit, stat;
     Boolean wasShaken = false;
     boolean screenOn;
-    int count;
     SharedPreferences sharedpreferences;
     private float mAccel; // acceleration apart from gravity
     private float mAccelCurrent; // current acceleration including gravity
@@ -134,6 +133,11 @@ public class MessageService extends Service implements SensorEventListener {
                 add = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                 cit = addresses.get(0).getLocality();
                 stat = addresses.get(0).getAdminArea();
+                StringBuffer smsBody = new StringBuffer();
+                smsBody.append("http://maps.google.com?q=");
+                smsBody.append(latitude);
+                smsBody.append(",");
+                smsBody.append(longitude);
                 SmsManager smsmanager = SmsManager.getDefault();
                 Cursor res = db.getAllData();
                 if (res.getCount() == 0)
@@ -147,7 +151,9 @@ public class MessageService extends Service implements SensorEventListener {
                         if (latitude == null && longitude == null) {
                             smsmanager.sendTextMessage(res.getString(0), null, msg, null, null);
                         } else {
-                            smsmanager.sendTextMessage(res.getString(0), null, msg + " I am at " + add + " " + cit + " " + stat, null, null);
+                            smsmanager.sendTextMessage(res.getString(0), null, msg + System.getProperty("line.separator")+
+                                    " I am at " + add + " " + cit + " " + stat+" "+ System.getProperty("line.separator")+
+                                    smsBody.toString(), null, null);
                             Toast.makeText(this, add, Toast.LENGTH_SHORT).show();
                             wasShaken = true;
                         }

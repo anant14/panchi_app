@@ -85,7 +85,6 @@ public class Contact extends AppCompatActivity {
         super.onResume();
         adapter.notifyDataSetChanged();
     }
-
     class contactHolder extends RecyclerView.ViewHolder{
 
         TextView name,number;
