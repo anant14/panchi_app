@@ -130,11 +130,12 @@ public class MessageService extends Service implements SensorEventListener {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                add = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                add = addresses.get(0).getAddressLine(0); // If any additional address line present than only,
+                                                            // check with max available address lines by getMaxAddressLineIndex()
                 cit = addresses.get(0).getLocality();
                 stat = addresses.get(0).getAdminArea();
                 StringBuffer smsBody = new StringBuffer();
-                smsBody.append("http://maps.google.com?q=");
+                smsBody.append("http://maps.google.com/?q=");
                 smsBody.append(latitude);
                 smsBody.append(",");
                 smsBody.append(longitude);
