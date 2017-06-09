@@ -1,6 +1,7 @@
 package com.halfdotfull.panchi_app.Activities;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -39,6 +40,7 @@ public class Police extends AppCompatActivity {
     Adapter adapter;
     Gson mGson;
     RequestQueue mRequestQueue;
+    ProgressDialog progressdialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +57,15 @@ public class Police extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(adapter);
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        progressdialog = new ProgressDialog(Police.this);
+        progressdialog.setMessage("Loading police stations");
+        progressdialog.show();
+        progressdialog.setCancelable(false);
     }
 
     private void populateArray() {
@@ -144,6 +155,7 @@ public class Police extends AppCompatActivity {
         @Override
         public void onBindViewHolder(final ViewH holder, int position) {
             policeDetail detail = policeDetails.get(position);
+            progressdialog.dismiss();
             holder.policeName.setText(detail.getPoliceStation());
             holder.number.setText(detail.getNumber());
             holder.number.setOnClickListener(new View.OnClickListener() {
