@@ -10,16 +10,16 @@ import android.content.Intent;
 
 public class ScreenReceiver extends BroadcastReceiver {
 
-    private boolean screenOff;
+    public static boolean screenOn;
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-            screenOff = true;
+            screenOn = false;
         } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-            screenOff = false;
+            screenOn = true;
         }
-        Intent i = new Intent(context, MessageService.class);
-        i.putExtra("screen_state", screenOff);
-        context.startService(i);
+        /*Intent i = new Intent(context, MessageService.class);
+        i.putExtra("screen_state", screenOn);
+        context.startService(i);*/
     }
 }

@@ -41,7 +41,8 @@
         <activity android:name=".Activities.isSafe" />
         <activity android:name=".Activities.Contact" />
 
-        <activity android:name=".Activities.WelcomePage">
+        <activity android:name=".Activities.WelcomePage"
+            android:theme="@style/NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

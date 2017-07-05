@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static com.android.volley.VolleyLog.TAG;
+
 /**
  * Created by anant bansal on 6/4/2017.
  */
@@ -77,7 +79,7 @@ public class MessageService extends Service implements SensorEventListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        screenOn = intent.getBooleanExtra("screen_state", false);
+        screenOn = ScreenReceiver.screenOn;
         wasShaken = false;
         lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         MyLocationListner listner = new MyLocationListner();
@@ -206,17 +208,17 @@ public class MessageService extends Service implements SensorEventListener {
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-
+            Log.d(TAG, "onStatusChanged: "+provider+" "+String.valueOf(status));
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-
+            Log.d(TAG, "onProviderEnabled: "+provider);
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-
+            Log.d(TAG, "onProviderDisabled: "+provider);
         }
     }
 }
