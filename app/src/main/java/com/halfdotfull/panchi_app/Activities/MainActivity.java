@@ -2,14 +2,18 @@ package com.halfdotfull.panchi_app.Activities;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -48,25 +52,18 @@ public class MainActivity extends AppCompatActivity {
         police = (CardView) findViewById(R.id.cardView5);
         helpline = (CardView) findViewById(R.id.cardView4);
 
-           /* Permissions.askforPermission(MainActivity.this,
-                    new String[]{Manifest.permission.SEND_SMS,Manifest.permission.CALL_PHONE},
-                    new Permissions.OnpermissionResultListner() {
-                        @Override
-                        public void OnGranted(String fperman) {
-                            startService();
-                            Toast.makeText(MainActivity.this, fperman, Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void OnDenied(String fperman) {
-                            Toast.makeText(MainActivity.this, fperman, Toast.LENGTH_SHORT).show();
-                        }
-                    });*/
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED&&
-                ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED||
+                ActivityCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED||
+                ActivityCompat.checkSelfPermission(this,Manifest.permission.READ_CONTACTS)!=PackageManager.PERMISSION_GRANTED||
+                ActivityCompat.checkSelfPermission(this,Manifest.permission.SEND_SMS)!=PackageManager.PERMISSION_GRANTED||
+                ActivityCompat.checkSelfPermission(this,Manifest.permission.CALL_PHONE)!=PackageManager.PERMISSION_GRANTED)
         {
             Permissions.askforPermission(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION},
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.SEND_SMS,
+                            Manifest.permission.CALL_PHONE
+                            },
                     new Permissions.OnpermissionResultListner() {
                         @Override
                         public void OnGranted(String fperman) {
@@ -79,54 +76,73 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
         }
-        if(ActivityCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED&&
-                ActivityCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED)
-        {
-            Permissions.askforPermission(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    new Permissions.OnpermissionResultListner() {
-                        @Override
-                        public void OnGranted(String fperman) {
-                            Toast.makeText(MainActivity.this, fperman, Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void OnDenied(String fperman) {
-                            Toast.makeText(MainActivity.this, fperman, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
-        if(ActivityCompat.checkSelfPermission(this,Manifest.permission.WRITE_CONTACTS)!=PackageManager.PERMISSION_GRANTED&&
-                ActivityCompat.checkSelfPermission(this,Manifest.permission.READ_CONTACTS)!=PackageManager.PERMISSION_GRANTED)
-        {
-            Permissions.askforPermission(this, new String[]{Manifest.permission.READ_CONTACTS,
-                            Manifest.permission.WRITE_CONTACTS},
-                    new Permissions.OnpermissionResultListner() {
-                        @Override
-                        public void OnGranted(String fperman) {
-                            Toast.makeText(MainActivity.this, fperman, Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void OnDenied(String fperman) {
-                            Toast.makeText(MainActivity.this, fperman, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
-
 
         isSafe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, isSafe.class);
-                startActivity(intent);
+                if(isLocationAvailable()) {
+                    Intent intent = new Intent(MainActivity.this, isSafe.class);
+                    startActivity(intent);
+                }
+                else{
+                    AlertDialog.Builder build=new AlertDialog.Builder(MainActivity.this);
+
+                    build.setCancelable(false).setMessage("Let Google help apps determines location."+
+                            " This means sending anonymous location data to Google,even when no apps are running")
+                            .setTitle("To check place is safe or not please open location services")
+                            .setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    build.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent i=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(i);
+                            dialog.dismiss();
+                        }
+                    });
+                    build.show();
+                }
+
+
             }
         });
         police.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Police.class);
-                startActivity(intent);
+                if(isLocationAvailable()) {
+                    Intent intent = new Intent(MainActivity.this, Police.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                    AlertDialog.Builder build=new AlertDialog.Builder(MainActivity.this);
+
+                    build.setCancelable(false).setMessage("Let Google help apps determines location."+
+                            " This means sending anonymous location data to Google,even when no apps are running")
+                            .setTitle("To find nearby police station please open location services ")
+                            .setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    build.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent i=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(i);
+                            dialog.dismiss();
+                        }
+                    });
+
+                    build.show();
+                }
+
             }
         });
         fakecall.setOnClickListener(new View.OnClickListener() {
@@ -203,27 +219,51 @@ public class MainActivity extends AppCompatActivity {
         Intent intent=new Intent(MainActivity.this,MessageService.class);
         intent.putExtra("number",number);
         intent.putExtra("serial",serial);
+      //  Toast.makeText(this, "SERVICE STARTED", Toast.LENGTH_SHORT).show();
         startService(intent);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        startService();
+        if(ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED)
+            if(!isLocationAvailable()){
+                AlertDialog.Builder build=new AlertDialog.Builder(this);
+
+                build.setCancelable(false).setMessage("Let Google help apps determines location."+
+                        " This means sending anonymous location data to Google,even when no apps are running").setTitle("Use Google's Location Services? ").setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                build.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent i=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(i);
+                        dialog.dismiss();
+                    }
+                });
+
+                build.show();
+            }
+            if(ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED)
+                if(isLocationAvailable())
+                    startService();
+    }
+
+    boolean isLocationAvailable(){
+        LocationManager location= (LocationManager) MainActivity.this.getSystemService(LOCATION_SERVICE);
+        boolean gpsenabled=false;
+        if(location.isProviderEnabled(location.GPS_PROVIDER)){
+            gpsenabled=true;
+        }
+        return gpsenabled;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        int count=0,i;
-        int size=permissions.length;
-        for(i=0;i<size;i++)
-        {
-            if(grantResults[i]== PackageManager.PERMISSION_GRANTED)
-                count++;
-        }
-        if(count==size)
-            startService();
 
         Permissions.OnPermResult(requestCode,permissions,grantResults);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

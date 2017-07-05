@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -80,21 +81,23 @@ public class MessageService extends Service implements SensorEventListener {
         wasShaken = false;
         lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         MyLocationListner listner = new MyLocationListner();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED) {
 
         }
-        lm.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                600000,
-                100,
-                listner
-        );
-        lm.requestLocationUpdates(
-                LocationManager.NETWORK_PROVIDER,
-                600000,
-                100,
-                listner
-        );
+        else {
+            lm.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    600000,
+                    100,
+                    listner
+            );
+            lm.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER,
+                    600000,
+                    100,
+                    listner
+            );
+        }
 
         sharedpreferences = getSharedPreferences("panchi", Context.MODE_PRIVATE);//To display MESSAGE
         Log.d("service", "onstart service");
@@ -120,7 +123,7 @@ public class MessageService extends Service implements SensorEventListener {
                 String msg = null;
                 Geocoder geocoder;
                 geocoder = new Geocoder(MessageService.this, Locale.getDefault());
-                List<Address> addresses = null;
+                List<Address> addresses = new ArrayList<>();
                 try {
                     if (latitude != null && longitude != null) {
                         addresses = geocoder.getFromLocation(Double.valueOf(latitude), Double.valueOf(longitude), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
@@ -146,10 +149,11 @@ public class MessageService extends Service implements SensorEventListener {
                 else {
                     while (res.moveToNext()) {
                         msg = sharedpreferences.getString("Message", "");
-                        if (msg == "") {
+                        if (msg.equals("")) {
                             msg = " Please help me ";
                         }
                         if (latitude == null && longitude == null) {
+
                             smsmanager.sendTextMessage(res.getString(0), null, msg, null, null);
                         } else {
                             smsmanager.sendTextMessage(res.getString(0), null, msg + System.getProperty("line.separator")+
@@ -195,9 +199,9 @@ public class MessageService extends Service implements SensorEventListener {
             latitude = String.valueOf(location.getLatitude());
             longitude = String.valueOf(location.getLongitude());
             location.getProvider();
-         /*   Toast.makeText(MessageService.this, "Latitude "+ latitude, Toast.LENGTH_SHORT).show();
-            Toast.makeText(MessageService.this, "longitude"+ longitude, Toast.LENGTH_SHORT).show();*/
-            accuracy = location.getAccuracy();
+           /* Toast.makeText(MessageService.this, "Latitude "+ latitude, Toast.LENGTH_SHORT).show();
+            Toast.makeText(MessageService.this, "longitude"+ longitude, Toast.LENGTH_SHORT).show();
+          */  accuracy = location.getAccuracy();
         }
 
         @Override

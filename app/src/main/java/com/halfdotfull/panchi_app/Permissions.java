@@ -29,51 +29,38 @@ public class Permissions {
     {
         if(requestcode==114) {
             for(i=0;i<perm.length;i++) {
-                if(rescodes[i]== PERMISSION_GRANTED && perm[i]== Manifest.permission.SEND_SMS) {
+                if(perm[i].equals(Manifest.permission.SEND_SMS)) {
+                    if(rescodes[i]== PERMISSION_GRANTED )
                     sopr1.OnGranted("permission for Message given");
-                }
-                else {sopr1.OnDenied("permission for Message not given");
-                }
-                if(rescodes[i]== PERMISSION_GRANTED && perm[i]== Manifest.permission.READ_EXTERNAL_STORAGE) {
-                    sopr1.OnGranted("permission for external storage given");
-                }
-                else {sopr1.OnDenied("permission for external storage not given");
-                }
-                if(rescodes[i]== PERMISSION_GRANTED && perm[i]== Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                    sopr1.OnGranted("permission for external storage given");
-                }
-                else {sopr1.OnDenied("permission for external storage not given");
-                }
-                if(rescodes[i]== PERMISSION_GRANTED && perm[i]== Manifest.permission.READ_CONTACTS) {
-                    sopr1.OnGranted("Permisssion for contacts given");
-                }
-                else {
-                    sopr1.OnDenied("Permisssion for contacts not given");
+                else sopr1.OnDenied("permission for Message not given");
                 }
 
-                if(rescodes[i]== PERMISSION_GRANTED && perm[i]== Manifest.permission.WRITE_CONTACTS) {
+                else
+                if(perm[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    if(rescodes[i]== PERMISSION_GRANTED )
+                    sopr1.OnGranted("permission for external storage given");
+                else sopr1.OnDenied("permission for external storage not given");
+                }
+
+                else
+                if(perm[i].equals(Manifest.permission.READ_CONTACTS)) {
+                    if(rescodes[i]== PERMISSION_GRANTED)
                     sopr1.OnGranted("Permisssion for contacts given");
+                else sopr1.OnDenied("Permisssion for contacts not given");
                 }
-                else {
-                    sopr1.OnDenied("Permisssion for contacts not given");
-                }
-                if(rescodes[i]== PERMISSION_GRANTED && perm[i]== Manifest.permission.ACCESS_FINE_LOCATION) {
+
+                else
+                if( perm[i].equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    if(rescodes[i]== PERMISSION_GRANTED)
                     sopr1.OnGranted("Permisssion for Location given");
+                else sopr1.OnDenied("Permisssion for Location not given");
                 }
-                else {
-                    sopr1.OnDenied("Permisssion for Location not given");
-                }
-                if(rescodes[i]== PERMISSION_GRANTED && perm[i]== Manifest.permission.ACCESS_COARSE_LOCATION) {
-                    sopr1.OnGranted("Permisssion for Location given");
-                }
-                else {
-                    sopr1.OnDenied("Permisssion for Location not given");
-                }
-                if(rescodes[i]== PERMISSION_GRANTED && perm[i]== Manifest.permission.CALL_PHONE) {
+
+                else
+                if(perm[i]== Manifest.permission.CALL_PHONE) {
+                    if(rescodes[i]== PERMISSION_GRANTED)
                     sopr1.OnGranted("Permisssion for Calling given");
-                }
-                else {
-                    sopr1.OnDenied("Permisssion for Calling not given");
+                else sopr1.OnDenied("Permisssion for Calling not given");
                 }
             }
         }
