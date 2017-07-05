@@ -38,7 +38,7 @@
             android:theme="@style/NoActionBar"/>
 
         <activity android:name=".Activities.Police" />
-        <activity android:name=".Activities.isSafe" />
+        <activity android:name=".Activities.IsSafe" />
         <activity android:name=".Activities.Contact" />
 
         <activity android:name=".Activities.WelcomePage"

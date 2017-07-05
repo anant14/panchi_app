@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(isLocationAvailable()) {
-                    Intent intent = new Intent(MainActivity.this, isSafe.class);
+                    Intent intent = new Intent(MainActivity.this, IsSafe.class);
                     startActivity(intent);
                 }
                 else{

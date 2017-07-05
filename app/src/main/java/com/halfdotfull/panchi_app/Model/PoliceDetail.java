@@ -4,12 +4,12 @@ package com.halfdotfull.panchi_app.Model;
  * Created by anant bansal on 6/4/2017.
  */
 
-public class policeDetail {
+public class PoliceDetail {
 
     String policeStation;
     String number;
 
-    public policeDetail(String policeStation, String number) {
+    public PoliceDetail(String policeStation, String number) {
         this.policeStation = policeStation;
         this.number = number;
     }

@@ -24,7 +24,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.halfdotfull.panchi_app.Model.PlaceDetail;
 import com.halfdotfull.panchi_app.Model.Request;
-import com.halfdotfull.panchi_app.Model.policeDetail;
+import com.halfdotfull.panchi_app.Model.PoliceDetail;
 import com.halfdotfull.panchi_app.R;
 import com.halfdotfull.panchi_app.Services.MessageService;
 
@@ -36,7 +36,7 @@ public class Police extends AppCompatActivity {
     RecyclerView mRecyclerView;
     ArrayList<String> police;
     ArrayList<String> policeName;
-    ArrayList<policeDetail> policeDetails;
+    ArrayList<PoliceDetail> policeDetails;
     Adapter adapter;
     Gson mGson;
     RequestQueue mRequestQueue;
@@ -111,10 +111,10 @@ public class Police extends AppCompatActivity {
                             Log.d("jsonRequest", "onResponse: " + response.toString());
                             PlaceDetail details = mGson.fromJson(response.toString(), PlaceDetail.class);
                             if (details.getResult().getFormatted_phone_number() == null) {
-                                policeDetails.add(new policeDetail(policeNames.get(finalI), "100"));
+                                policeDetails.add(new PoliceDetail(policeNames.get(finalI), "100"));
                                 adapter.notifyDataSetChanged();
                             } else {
-                                policeDetails.add(new policeDetail(policeNames.get(finalI), details.getResult().getFormatted_phone_number()));
+                                policeDetails.add(new PoliceDetail(policeNames.get(finalI), details.getResult().getFormatted_phone_number()));
                                 adapter.notifyItemInserted(finalI);
                                 Log.d("Number", "onResponse: " + details.getResult().getFormatted_phone_number());
                             }
@@ -154,7 +154,7 @@ public class Police extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewH holder, int position) {
-            policeDetail detail = policeDetails.get(position);
+            PoliceDetail detail = policeDetails.get(position);
             progressdialog.dismiss();
             holder.policeName.setText(detail.getPoliceStation());
             holder.number.setText(detail.getNumber());

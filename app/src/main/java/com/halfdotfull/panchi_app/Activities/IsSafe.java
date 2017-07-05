@@ -13,7 +13,7 @@ import com.halfdotfull.panchi_app.Services.MessageService;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class isSafe extends AppCompatActivity {
+public class IsSafe extends AppCompatActivity {
 
     ProgressDialog progress=null;
     TextView score,title,safe;
@@ -77,10 +77,10 @@ public class isSafe extends AppCompatActivity {
             @Override
             public void onFinish() {
                 progress.dismiss();
-                Toast.makeText(isSafe.this, String.valueOf(sum), Toast.LENGTH_LONG).show();
+                Toast.makeText(IsSafe.this, String.valueOf(sum), Toast.LENGTH_LONG).show();
                 title.setText("THE SCORE IS");
                 score.setText(String.valueOf(sum));
-                Toast.makeText(isSafe.this, String.valueOf(count_open) + "OPEN", Toast.LENGTH_LONG).show();
+                Toast.makeText(IsSafe.this, String.valueOf(count_open) + "OPEN", Toast.LENGTH_LONG).show();
 
                 if(sum>7)
                 {
