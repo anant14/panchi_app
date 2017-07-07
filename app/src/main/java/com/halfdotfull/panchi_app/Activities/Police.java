@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,7 +15,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -23,8 +26,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.halfdotfull.panchi_app.Model.PlaceDetail;
-import com.halfdotfull.panchi_app.Model.Request;
 import com.halfdotfull.panchi_app.Model.PoliceDetail;
+import com.halfdotfull.panchi_app.Model.Request;
 import com.halfdotfull.panchi_app.R;
 import com.halfdotfull.panchi_app.Services.MessageService;
 
@@ -37,15 +40,18 @@ public class Police extends AppCompatActivity {
     ArrayList<String> police;
     ArrayList<String> policeName;
     ArrayList<PoliceDetail> policeDetails;
+    RelativeLayout relativeLayout;
     Adapter adapter;
     Gson mGson;
+    int check=0;
+    long checkLatiLongi;
     RequestQueue mRequestQueue;
     ProgressDialog progressdialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_police);
-
+        relativeLayout= (RelativeLayout) findViewById(R.id.relativeLayoutPolice);
         mRecyclerView = (RecyclerView) findViewById(R.id.policeRecycle);
         police = new ArrayList<>();
         policeName = new ArrayList<>();
@@ -53,7 +59,9 @@ public class Police extends AppCompatActivity {
         adapter = new Adapter();
         mGson = new Gson();
         mRequestQueue = Volley.newRequestQueue(this);
-        populateArray();
+        checkLatiLongi = System.currentTimeMillis();
+
+        Log.d("Lati", "onCreate: "+MessageService.latitude);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(adapter);
 
@@ -62,13 +70,42 @@ public class Police extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        check=0;
+        checkLatiLongi=System.currentTimeMillis();
         progressdialog = new ProgressDialog(Police.this);
         progressdialog.setMessage("Loading police stations");
         progressdialog.show();
         progressdialog.setCancelable(false);
+        Runnable runnable =new Runnable() {
+            @Override
+            public void run() {
+                while(System.currentTimeMillis()-checkLatiLongi<5000){
+                    if(MessageService.latitude!=null){
+                        populateArray();
+                        check=1;
+                        break;
+                    }
+                }
+                if(check==0){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Snackbar snackbar=Snackbar.make(relativeLayout,"Current Location undetermined",3000);
+                            progressdialog.dismiss();
+                            snackbar.show();
+                            Toast.makeText(Police.this, "Cannot fetch location. Please try Again", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            }
+        };
+
+        new Thread(runnable).start();
     }
 
     private void populateArray() {
+        Log.d("PoliceArray", "populateArray: Poilice Array");
         JsonObjectRequest jsonRequest = new JsonObjectRequest(
                 "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+ MessageService.latitude+","+MessageService.longitude+"&radius=2000&type=police&key=AIzaSyBgEqbEuZ8LJdG7BmDXn3frx89AK1IVd0c",
                 null,
@@ -89,7 +126,7 @@ public class Police extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("Error", "onErrorResponse: " + error.getMessage());
+                        Log.d("Harsh", "onErrorResponse: " + error.getMessage());
                     }
                 });
         mRequestQueue.add(jsonRequest);
@@ -97,6 +134,7 @@ public class Police extends AppCompatActivity {
 
     private void getPhoneNumber(final ArrayList<String> policeNames) {
         Log.d("numPolice", "getPhoneNumber: " + police.size());
+        policeDetails=new ArrayList<>();
         for (int i = 0; i < police.size(); i++) {
             String id = police.get(i);
             Log.d("numPolice", "getPhoneNumber: " + id);
@@ -124,7 +162,8 @@ public class Police extends AppCompatActivity {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-
+                            Snackbar snackBar=Snackbar.make(relativeLayout,"Some error occured",1000);
+                            snackBar.show();
                         }
                     });
             mRequestQueue.add(number);
@@ -180,6 +219,7 @@ public class Police extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
+            Log.d("ArraySize", "getItemCount: "+policeDetails.size());
             return policeDetails.size();
         }
     }

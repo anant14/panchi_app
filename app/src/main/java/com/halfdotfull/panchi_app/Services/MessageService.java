@@ -27,11 +27,7 @@ import android.widget.Toast;
 
 import com.halfdotfull.panchi_app.Database.ContactDataBase;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -42,18 +38,16 @@ import static com.android.volley.VolleyLog.TAG;
  * Created by anant bansal on 6/4/2017.
  */
 
-public class MessageService extends Service implements SensorEventListener {
+public class MessageService extends Service implements SensorEventListener{
 
     private final String DEBUG_TAG = "[GPS Ping]";
     private boolean xmlSuccessful = false;
     private boolean locationTimeExpired = false;
     private LocationManager lm;
-    public static String latitude;
-    public static String longitude;
+    public static String latitude, longitude;
     public static double accuracy;
     String add, cit, stat;
-    Boolean wasShaken = false;
-    boolean screenOn;
+    boolean wasShaken = false, screenOn;
     SharedPreferences sharedpreferences;
     private float mAccel; // acceleration apart from gravity
     private float mAccelCurrent; // current acceleration including gravity
@@ -83,19 +77,18 @@ public class MessageService extends Service implements SensorEventListener {
         wasShaken = false;
         lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         MyLocationListner listner = new MyLocationListner();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-        }
-        else {
+        } else {
             lm.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
-                    600000,
+                    10000,
                     100,
                     listner
             );
             lm.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER,
-                    600000,
+                    10000,
                     100,
                     listner
             );
@@ -136,7 +129,7 @@ public class MessageService extends Service implements SensorEventListener {
                     e.printStackTrace();
                 }
                 add = addresses.get(0).getAddressLine(0); // If any additional address line present than only,
-                                                            // check with max available address lines by getMaxAddressLineIndex()
+                // check with max available address lines by getMaxAddressLineIndex()
                 cit = addresses.get(0).getLocality();
                 stat = addresses.get(0).getAdminArea();
                 StringBuffer smsBody = new StringBuffer();
@@ -158,8 +151,8 @@ public class MessageService extends Service implements SensorEventListener {
 
                             smsmanager.sendTextMessage(res.getString(0), null, msg, null, null);
                         } else {
-                            smsmanager.sendTextMessage(res.getString(0), null, msg + System.getProperty("line.separator")+
-                                    " I am at " + add + " " + cit + " " + stat+" "+ System.getProperty("line.separator")+
+                            smsmanager.sendTextMessage(res.getString(0), null, msg + System.getProperty("line.separator") +
+                                    " I am at " + add + " " + cit + " " + stat + " " + System.getProperty("line.separator") +
                                     smsBody.toString(), null, null);
                             Toast.makeText(this, add, Toast.LENGTH_SHORT).show();
                             wasShaken = true;
@@ -168,13 +161,6 @@ public class MessageService extends Service implements SensorEventListener {
                         Toast.makeText(getApplicationContext(), "Emergency Message sent to " + res.getString(1), Toast.LENGTH_LONG).show();
                     }
                 }
-                File file = getFilesDir();
-                File in = new File(file, "ContactsList");
-                FileInputStream fin = null;
-                fin = new FileInputStream(in);
-                InputStreamReader isr = new InputStreamReader(fin);
-                BufferedReader bufRdr = new BufferedReader(isr);
-                String str = "";
                 Toast.makeText(this, sharedpreferences.getString("Message", ""), Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {

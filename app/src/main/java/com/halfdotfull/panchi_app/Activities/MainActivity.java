@@ -261,7 +261,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return gpsenabled;
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
