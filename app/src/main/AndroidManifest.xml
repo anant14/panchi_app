@@ -35,12 +35,19 @@
         <service android:name=".Services.MessageService" />
 
         <activity android:name=".Activities.FakeRinging"
-            android:theme="@style/NoActionBar"/>
+            android:theme="@style/NoActionBar"
+            android:showOnLockScreen="true"
+            android:screenOrientation="sensorPortrait"/>
 
         <activity android:name=".Activities.Police" />
         <activity android:name=".Activities.IsSafe" />
         <activity android:name=".Activities.Contact" />
-
+        <receiver android:name=".Services.ScreenReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.SCREEN_ON"/>
+                <action android:name="android.intent.action.SCREEN_OFF"/>
+            </intent-filter>
+        </receiver>
         <activity android:name=".Activities.WelcomePage"
             android:theme="@style/NoActionBar">
             <intent-filter>
