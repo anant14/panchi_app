@@ -40,11 +40,6 @@ public class FakeRinging extends AppCompatActivity{
             public void onReceive(Context context, Intent intent) {
                 if(intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
                     screenOn=false;
-                    try {
-                        ringtone.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 }
                 if(intent.getAction().equals(Intent.ACTION_SCREEN_ON)){
                     screenOn=true;

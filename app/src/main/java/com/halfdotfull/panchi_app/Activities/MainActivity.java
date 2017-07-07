@@ -3,6 +3,8 @@ package com.halfdotfull.panchi_app.Activities;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +20,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.InputType;
@@ -28,8 +32,6 @@ import com.halfdotfull.panchi_app.FakeCallReceiver;
 import com.halfdotfull.panchi_app.Permissions;
 import com.halfdotfull.panchi_app.R;
 import com.halfdotfull.panchi_app.Services.MessageService;
-
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,8 +49,7 @@ public class MainActivity extends AppCompatActivity {
         message = (CardView) findViewById(R.id.cardView2);
         isSafe = (CardView) findViewById(R.id.cardView7);
         contacts = (CardView) findViewById(R.id.cardView1);
-
-        fakecall = (CardView) findViewById(R.id.cardView3);
+//        fakecall = (CardView) findViewById(R.id.cardView3);
         police = (CardView) findViewById(R.id.cardView5);
         helpline = (CardView) findViewById(R.id.cardView4);
 
@@ -145,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+/*
         fakecall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,9 +157,11 @@ public class MainActivity extends AppCompatActivity {
 
                 String fakeNameEntered = "Papa";
                 String fakeNumberEntered = "9412168792";
+                Log.d("TAGGER", "onClick: "+String.valueOf(currentFakeTime));
                 setUpAlarm(currentFakeTime, fakeNameEntered, fakeNumberEntered);
             }
         });
+*/
         contacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -201,6 +205,22 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
+        Intent intent = new Intent(this, FakeCallReceiver.class);
+
+        intent.putExtra("FAKENAME", "Papa");
+        intent.putExtra("FAKENUMBER", "9412164248");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),0 ,intent,PendingIntent.FLAG_CANCEL_CURRENT);
+        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.mipmap.panchi)
+                .setContentTitle("Temp")
+                .setContentText("Calling From here")
+                .setOngoing(true)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .addAction(R.drawable.s6_speak,"FAKE CALL",pendingIntent);
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(0, notificationBuilder.build());
     }
 
     public void setUpAlarm(long selectedTimeInMilliseconds, String fakeName, String fakeNumber){
@@ -212,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("FAKENUMBER", fakeNumber);
 
         PendingIntent fakePendingIntent = PendingIntent.getBroadcast(this, 0,  intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, selectedTimeInMilliseconds, fakePendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, 0, fakePendingIntent);
         Toast.makeText(getApplicationContext(), "Your fake call time has been set", Toast.LENGTH_SHORT).show();
     }
     private void startService() {

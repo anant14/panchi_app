@@ -58,7 +58,7 @@
                     android:layout_gravity="left|center"
                     android:src="@drawable/police"/>
             </FrameLayout>
-            <FrameLayout
+            <!--<FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <FrameLayout
@@ -100,7 +100,7 @@
                     android:layout_height="96dp"
                     android:layout_gravity="left|center"
                     android:src="@drawable/fakecalls"/>
-            </FrameLayout>
+            </FrameLayout>-->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
