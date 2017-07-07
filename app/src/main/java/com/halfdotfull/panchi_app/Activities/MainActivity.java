@@ -213,8 +213,7 @@ public class MainActivity extends AppCompatActivity {
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.panchi)
-                .setContentTitle("Temp")
-                .setContentText("Calling From here")
+                .setContentText("Fake call after 10 seconds")
                 .setOngoing(true)
                 .setPriority(Notification.PRIORITY_HIGH)
                 .addAction(R.drawable.s6_speak,"FAKE CALL",pendingIntent);
@@ -239,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent=new Intent(MainActivity.this,MessageService.class);
         intent.putExtra("number",number);
         intent.putExtra("serial",serial);
-      //  Toast.makeText(this, "SERVICE STARTED", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "SERVICE STARTED", Toast.LENGTH_SHORT).show();
         startService(intent);
     }
 
@@ -269,7 +268,6 @@ public class MainActivity extends AppCompatActivity {
                 build.show();
             }
             if(ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED)
-                if(isLocationAvailable())
                     startService();
     }
 

@@ -12,7 +12,11 @@ import android.widget.Toast;
 
 public class ScreenReceiver extends BroadcastReceiver {
 
-    public static boolean screenOn=true;
+    public boolean isScreenOn() {
+        return screenOn;
+    }
+
+    public boolean screenOn=true;
     IntentFilter filter=new IntentFilter(Intent.ACTION_SCREEN_ON);
 
     @Override
@@ -23,9 +27,6 @@ public class ScreenReceiver extends BroadcastReceiver {
             screenOn = true;
             Toast.makeText(context, "Screen On", Toast.LENGTH_SHORT).show();
         }
-        /*Intent i = new Intent(context, MessageService.class);
-        i.putExtra("screen_state", screenOn);
-        context.startService(i);*/
     }
 
 
