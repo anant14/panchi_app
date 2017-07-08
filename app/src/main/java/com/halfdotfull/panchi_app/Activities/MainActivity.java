@@ -1,7 +1,6 @@
 package com.halfdotfull.panchi_app.Activities;
 
 import android.Manifest;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -223,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
         notificationManager.notify(0, notificationBuilder.build());
     }
 
-    public void setUpAlarm(long selectedTimeInMilliseconds, String fakeName, String fakeNumber){
+/*    public void setUpAlarm(long selectedTimeInMilliseconds, String fakeName, String fakeNumber){
 
         AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, FakeCallReceiver.class);
@@ -234,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent fakePendingIntent = PendingIntent.getBroadcast(this, 0,  intent, PendingIntent.FLAG_CANCEL_CURRENT);
         alarmManager.set(AlarmManager.RTC_WAKEUP, 0, fakePendingIntent);
         Toast.makeText(getApplicationContext(), "Your fake call time has been set", Toast.LENGTH_SHORT).show();
-    }
+    }*/
     private void startService() {
         Intent intent=new Intent(MainActivity.this,MessageService.class);
         intent.putExtra("number",number);
