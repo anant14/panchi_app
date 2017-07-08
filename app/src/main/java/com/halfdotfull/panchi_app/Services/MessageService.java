@@ -148,7 +148,7 @@ public class MessageService extends Service implements SensorEventListener {
 
             }
              catch (Exception e) {
-                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+               // Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

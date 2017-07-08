@@ -24,7 +24,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.InputType;
 import android.view.View;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.halfdotfull.panchi_app.FakeCallReceiver;
@@ -67,16 +66,16 @@ public class MainActivity extends AppCompatActivity {
                     new Permissions.OnpermissionResultListner() {
                         @Override
                         public void OnGranted(String fperman) {
-                            Toast.makeText(MainActivity.this, fperman, Toast.LENGTH_SHORT).show();
+                           // Toast.makeText(MainActivity.this, fperman, Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
                         public void OnDenied(String fperman) {
-                            Toast.makeText(MainActivity.this, fperman, Toast.LENGTH_SHORT).show();
+                          //  Toast.makeText(MainActivity.this, fperman, Toast.LENGTH_SHORT).show();
                         }
                     });
         }
-
+        startService();
         isSafe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,26 +84,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 else{
-                    AlertDialog.Builder build=new AlertDialog.Builder(MainActivity.this);
-
-                    build.setCancelable(false).setMessage("Let Google help apps determines location."+
-                            " This means sending anonymous location data to Google,even when no apps are running")
-                            .setTitle("To check place is safe or not please open location services")
-                            .setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    build.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent i=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                            startActivity(i);
-                            dialog.dismiss();
-                        }
-                    });
-                    build.show();
+                LocationPermissionCheck();
                 }
 
 
@@ -119,28 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    AlertDialog.Builder build=new AlertDialog.Builder(MainActivity.this);
-
-                    build.setCancelable(false).setMessage("Let Google help apps determines location."+
-                            " This means sending anonymous location data to Google,even when no apps are running")
-                            .setTitle("To find nearby police station please open location services ")
-                            .setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-
-                    build.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent i=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                            startActivity(i);
-                            dialog.dismiss();
-                        }
-                    });
-
-                    build.show();
+                   LocationPermissionCheck();
                 }
 
             }
@@ -235,48 +194,94 @@ public class MainActivity extends AppCompatActivity {
     }*/
     private void startService() {
         Intent intent=new Intent(MainActivity.this,MessageService.class);
-        intent.putExtra("number",number);
+       /* intent.putExtra("number",number);
         intent.putExtra("serial",serial);
-        Toast.makeText(this, "SERVICE STARTED", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "SERVICE STARTED", Toast.LENGTH_SHORT).show();*/
         startService(intent);
     }
 
-    @Override
+ /*   @Override
     protected void onStart() {
         super.onStart();
         if(ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED)
             if(!isLocationAvailable()){
-                AlertDialog.Builder build=new AlertDialog.Builder(this);
-
-                build.setCancelable(false).setMessage("Let Google help apps determines location."+
-                        " This means sending anonymous location data to Google,even when no apps are running").setTitle("Use Google's Location Services? ").setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                build.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent i=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivity(i);
-                        dialog.dismiss();
-                    }
-                });
-
-                build.show();
+                LocationPermissionCheck();
             }
             if(ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED)
                     startService();
-    }
-
+    }*/
     boolean isLocationAvailable(){
-        LocationManager location= (LocationManager) MainActivity.this.getSystemService(LOCATION_SERVICE);
-        boolean gpsenabled=false;
-        if(location.isProviderEnabled(location.GPS_PROVIDER)){
-            gpsenabled=true;
+        boolean gpsenabled = false;
+        if(ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED) {
+            LocationManager location = (LocationManager) MainActivity.this.getSystemService(LOCATION_SERVICE);
+            if (location.isProviderEnabled(location.GPS_PROVIDER)) {
+                gpsenabled = true;
+            }
         }
         return gpsenabled;
+    }
+
+    void LocationPermissionCheck()
+    {
+        if(ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED||
+                ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+            Permissions.askforPermission(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    },
+                    new Permissions.OnpermissionResultListner() {
+                        @Override
+                        public void OnGranted(String fperman) {
+
+                        }
+
+                        @Override
+                        public void OnDenied(String fperman) {
+
+                        }
+                    });
+        }
+
+        else
+        {
+            AlertDialog.Builder build=new AlertDialog.Builder(MainActivity.this);
+            String msg="To continue ,let your device turn on location using Google's Location Service."+
+                    System.getProperty("line.separator")+System.getProperty("line.separator");
+            build.setCancelable(false).setMessage(msg)
+                    .setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            AlertDialog.Builder build=new AlertDialog.Builder(MainActivity.this);
+                            String msg="Panchi services will not work properly please give the loaction permission to work"+
+                                    System.getProperty("line.separator")+System.getProperty("line.separator");
+                            build.setCancelable(false).setMessage(msg).setTitle("ALERT")
+                                    .setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            finish();
+                                        }
+                                    });
+                            build.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent i=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                    startActivity(i);
+                                    dialog.dismiss();
+                                }
+                            });
+                            build.show();
+                        }
+                    });
+            build.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent i=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(i);
+                    dialog.dismiss();
+                }
+            });
+            build.show();
+        }
     }
 
     @Override
