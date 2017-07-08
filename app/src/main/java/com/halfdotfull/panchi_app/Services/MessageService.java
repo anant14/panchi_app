@@ -27,11 +27,7 @@ import android.widget.Toast;
 
 import com.halfdotfull.panchi_app.Database.ContactDataBase;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -48,17 +44,17 @@ public class MessageService extends Service implements SensorEventListener {
     private boolean xmlSuccessful = false;
     private boolean locationTimeExpired = false;
     private LocationManager lm;
-    public static String latitude;
-    public static String longitude;
+    public static String latitude=null,longitude=null;
     public static double accuracy;
-    String add, cit, stat;
+    String address, city, state;
     Boolean wasShaken = false;
-    boolean screenOn;
+    boolean screenOn=true;
     SharedPreferences sharedpreferences;
     private float mAccel; // acceleration apart from gravity
     private float mAccelCurrent; // current acceleration including gravity
     private float mAccelLast; // last acceleration including gravit
     ContactDataBase db;
+    BroadcastReceiver mReceiver;
 
     public MessageService() {
         mAccel = 0.00f;
@@ -72,14 +68,25 @@ public class MessageService extends Service implements SensorEventListener {
         // REGISTER RECEIVER THAT HANDLES SCREEN ON AND SCREEN OFF LOGIC
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
-        BroadcastReceiver mReceiver = new ScreenReceiver();
         registerReceiver(mReceiver, filter);
+
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        screenOn = ScreenReceiver.screenOn;
+        mReceiver=new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(intent.getAction().equals(Intent.ACTION_SCREEN_ON)){
+                    screenOn=true;
+                }
+                if(intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
+                    screenOn=false;
+                }
+            }
+        };
         wasShaken = false;
         lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         MyLocationListner listner = new MyLocationListner();
@@ -89,20 +96,20 @@ public class MessageService extends Service implements SensorEventListener {
         else {
             lm.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
-                    600000,
+                    10000,
                     100,
                     listner
             );
             lm.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER,
-                    600000,
+                    10000,
                     100,
                     listner
             );
         }
 
         sharedpreferences = getSharedPreferences("panchi", Context.MODE_PRIVATE);//To display MESSAGE
-        Log.d("service", "onstart service");
+        Log.d("Registered", "onstart service");
         SensorManager sManager = (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         Sensor sensor = sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL); // or other delay
@@ -120,67 +127,65 @@ public class MessageService extends Service implements SensorEventListener {
             float delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta;
             db = new ContactDataBase(MessageService.this);
-
-            if (mAccel > 50 && wasShaken == false && !screenOn) {
-                String msg = null;
-                Geocoder geocoder;
-                geocoder = new Geocoder(MessageService.this, Locale.getDefault());
-                List<Address> addresses = new ArrayList<>();
-                try {
-                    if (latitude != null && longitude != null) {
-                        addresses = geocoder.getFromLocation(Double.valueOf(latitude), Double.valueOf(longitude), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-                    } else {
-                        Toast.makeText(this, "Value of latitude and logitude are NULL", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                add = addresses.get(0).getAddressLine(0); // If any additional address line present than only,
-                                                            // check with max available address lines by getMaxAddressLineIndex()
-                cit = addresses.get(0).getLocality();
-                stat = addresses.get(0).getAdminArea();
-                StringBuffer smsBody = new StringBuffer();
-                smsBody.append("http://maps.google.com/?q=");
-                smsBody.append(latitude);
-                smsBody.append(",");
-                smsBody.append(longitude);
+            if (mAccel > 50 && wasShaken == false && screenOn) {
+                String message=createMessage();
                 SmsManager smsmanager = SmsManager.getDefault();
                 Cursor res = db.getAllData();
+                Log.d("TAGGER", "onSensorChanged: "+String.valueOf(res.getCount()));
                 if (res.getCount() == 0)
                     Toast.makeText(this, "No contacts given", Toast.LENGTH_SHORT).show();
                 else {
                     while (res.moveToNext()) {
-                        msg = sharedpreferences.getString("Message", "");
-                        if (msg.equals("")) {
-                            msg = " Please help me ";
-                        }
-                        if (latitude == null && longitude == null) {
-
-                            smsmanager.sendTextMessage(res.getString(0), null, msg, null, null);
-                        } else {
-                            smsmanager.sendTextMessage(res.getString(0), null, msg + System.getProperty("line.separator")+
-                                    " I am at " + add + " " + cit + " " + stat+" "+ System.getProperty("line.separator")+
-                                    smsBody.toString(), null, null);
-                            Toast.makeText(this, add, Toast.LENGTH_SHORT).show();
+                        smsmanager.sendTextMessage(res.getString(0),null,message,null,null);
+                            Toast.makeText(this, address, Toast.LENGTH_SHORT).show();
                             wasShaken = true;
                         }
-                        Log.d("service", msg);
-                        Toast.makeText(getApplicationContext(), "Emergency Message sent to " + res.getString(1), Toast.LENGTH_LONG).show();
+                        Log.d("service", message);
+                        Toast.makeText(this, "Emergency Message sent to " + res.getString(1), Toast.LENGTH_LONG).show();
                     }
-                }
-                File file = getFilesDir();
-                File in = new File(file, "ContactsList");
-                FileInputStream fin = null;
-                fin = new FileInputStream(in);
-                InputStreamReader isr = new InputStreamReader(fin);
-                BufferedReader bufRdr = new BufferedReader(isr);
-                String str = "";
                 Toast.makeText(this, sharedpreferences.getString("Message", ""), Toast.LENGTH_SHORT).show();
+                }
+
             }
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+             catch (Exception e) {
+                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
+    private String createMessage() {
+        String message="";
+        Geocoder geocoder=new Geocoder(MessageService.this,Locale.getDefault());
+        List<Address> addressList=new ArrayList<>();
+        if(latitude!=null&&longitude!=null){
+            try {
+                addressList=geocoder.getFromLocation(Double.valueOf(latitude),Double.valueOf(longitude),1);
+                address=addressList.get(0).getAddressLine(0);
+                city=addressList.get(0).getLocality();
+                state=addressList.get(0).getAdminArea();
+                StringBuffer smsAddressLink = new StringBuffer();
+                smsAddressLink.append("http://maps.google.com/?q=");
+                smsAddressLink.append(latitude);
+                smsAddressLink.append(",");
+                smsAddressLink.append(longitude);
+                String messageByUser=sharedpreferences.getString("Message", "");
+                if (messageByUser.equals("")) {
+                    messageByUser = " Please help me ";
+                }
+                message=messageByUser + System.getProperty("line.separator")+
+                        " I am at " + address +
+                        " " + city + " " +
+                        state +" "+ System.getProperty("line.separator")+
+                        smsAddressLink.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            message="Please help me";
+        }
+        return message;
+    }
+
 
 
     @Override
