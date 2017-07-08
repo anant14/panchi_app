@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 .setContentText("Fake call after 10 seconds")
                 .setOngoing(true)
                 .setPriority(Notification.PRIORITY_HIGH)
-                .addAction(R.drawable.s6_speak,"FAKE CALL",pendingIntent);
+                .addAction(R.drawable.phone,"CALL",pendingIntent);
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(0, notificationBuilder.build());
