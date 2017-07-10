@@ -66,6 +66,7 @@ public class Police extends AppCompatActivity {
         progressdialog.setMessage("Loading police stations");
         progressdialog.show();
         progressdialog.setCancelable(false);
+        populateArray();
     }
 
     private void populateArray() {
